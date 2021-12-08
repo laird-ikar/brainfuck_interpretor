@@ -6,7 +6,7 @@
 /*   By: bguyot <bguyot@student.42mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 14:46:09 by bguyot            #+#    #+#             */
-/*   Updated: 2021/12/08 16:03:56 by bguyot           ###   ########.fr       */
+/*   Updated: 2021/12/08 16:44:06 by bguyot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,7 @@ int	main(int ac, char *av[])
 		return (0);
 	}
 	else if (ac == 2)
-	{
 		interpret(av[1], ptr);
-	}
 	else
 	{
 		ft_putstr("No Brainfuck to interpret\n");
@@ -44,12 +42,12 @@ int	main(int ac, char *av[])
 
 void	interpret(char *brainfuck, char *ptr)
 {
-	int	i;
-	int	loop_level;
-	int	loop_index[NB_CASE];
+	int		i;
+	t_loop	*loop;
 
 	i = 0;
-	loop_level = 0;
+	loop = malloc(sizeof(t_loop));
+	loop->level = 0;
 	while (brainfuck[i])
 	{
 		if (brainfuck[i] == '>')
@@ -64,18 +62,8 @@ void	interpret(char *brainfuck, char *ptr)
 			ft_putchar(*ptr);
 		else if (brainfuck[i] == ',')
 			*ptr = ft_getchar();
-		else if (brainfuck[i] == '[')
-		{
-			loop_level++;
-			loop_index[loop_level] = i;
-		}
-		else if (brainfuck[i] == ']')
-		{
-			if (*ptr)
-				i = loop_index[loop_level];
-			else
-				loop_level--;
-		}
+		else
+			check_loop(loop, &i, brainfuck, ptr);
 		i++;
 	}
 }
@@ -87,4 +75,20 @@ void	init_tab(char *tab, int size)
 	i = 0;
 	while (i < size)
 	tab[i++] = 0;
+}
+
+void	check_loop(t_loop *loop, int *i, char *brainfuck, char *ptr)
+{
+	if (brainfuck[*i] == '[')
+	{
+		loop->level++;
+		loop->index[loop->level] = *i;
+	}
+	else if (brainfuck[*i] == ']')
+	{
+		if (*ptr)
+			*i = loop->index[loop->level];
+		else
+			loop->level--;
+	}
 }
